@@ -9,7 +9,7 @@ import traceback
 import discord
 from discord.ext import tasks
 
-debug = True
+debug = False
 
 #########################################################################################
 # Requirements for Discord Bot
