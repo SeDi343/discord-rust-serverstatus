@@ -1,0 +1,7 @@
+{
+   "discord_token": "YOURDISCORDBOT",
+   "api_url": "https://api.battlemetrics.com/servers/YOURSERVERNUMBER",
+   "update_interval": "1",
+   "gameserver_ip": "",
+   "gameserver_port": ""
+}
