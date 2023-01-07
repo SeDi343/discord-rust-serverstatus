@@ -9,7 +9,7 @@ import traceback
 import discord
 from discord.ext import tasks
 
-debug = False
+debug = True
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -82,13 +82,6 @@ async def statusloop():
                   max_players = rust_server_status["data"]["attributes"].get("maxPlayers")
                   queued_players = rust_server_status["data"]["attributes"]["details"].get("rust_queued_players")
 
-                  if debug:
-                     print(f"Rust Server status: {status}")
-                     print(f"Current Player Count: {current_players}")
-                     print(f"Max Player Count: {max_players}")
-                     print(f"Players in Queue: {queued_players}")
-                     print(f"Next Update: {update_interval}")
-
                   # Check status and create activity string
                   if status == "online":
                      if int(queued_players) > 0:
@@ -99,7 +92,12 @@ async def statusloop():
                      activitymessage = f"offline"
 
                   if debug:
+                     print(f"Rust Server status: {status}: {current_players}/{max_players} ({queued_players})")
                      print(f"Acitivity Message: \"{activitymessage}\"")
+                     print(f"Next Update: {update_interval}")
+               else:
+                  if debug:
+                     print(f"Failed to update API: {response.status}\n")
 
          # Send new Status Message
          await client.change_presence(status=discord.Status.online, activity=discord.Game(name=activitymessage))
