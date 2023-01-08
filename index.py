@@ -96,8 +96,7 @@ async def statusloop():
                      print(f"Acitivity Message: \"{activitymessage}\"")
                      print(f"Next Update: {update_interval}")
                else:
-                  if debug:
-                     print(f"Failed to update API: {response.status}\n")
+                  print(f"> Failed to update API: {response.status}\n")
 
          # Send new Status Message
          await client.change_presence(status=discord.Status.online, activity=discord.Game(name=activitymessage))
