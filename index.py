@@ -9,7 +9,7 @@ import traceback
 import discord
 from discord.ext import tasks
 
-debug = True
+debug = False
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -81,18 +81,19 @@ async def statusloop():
                   current_players = rust_server_status["data"]["attributes"].get("players")
                   max_players = rust_server_status["data"]["attributes"].get("maxPlayers")
                   queued_players = rust_server_status["data"]["attributes"]["details"].get("rust_queued_players")
+                  last_wipe = rust_server_status["data"]["attributes"]["details"].get("rust_last_wipe").split("T")[0].split("-")
 
                   # Check status and create activity string
                   if status == "online":
                      if int(queued_players) > 0:
-                        activitymessage = f"{current_players}/{max_players} ({queued_players})"
+                        activitymessage = f"{current_players}/{max_players} ({queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}."
                      else:
-                        activitymessage = f"{current_players}/{max_players}"
+                        activitymessage = f"{current_players}/{max_players} | Wipe: {last_wipe[2]}.{last_wipe[1]}."
                   elif status == "offline":
                      activitymessage = f"offline"
 
                   if debug:
-                     print(f"Rust Server status: {status}: {current_players}/{max_players} ({queued_players})")
+                     print(f"Rust Server status: {status}: {current_players}/{max_players} ({queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}.")
                      print(f"Acitivity Message: \"{activitymessage}\"")
                      print(f"Next Update: {update_interval}")
                else:
