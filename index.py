@@ -88,14 +88,14 @@ async def statusloop():
          # Check status and create activity string
          if status == "online":
             if int(queued_players) > 0:
-               activitymessage = f"{current_players}/{max_players} ({queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}."
+               activitymessage = f"{current_players}/{max_players} (+{queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}."
             else:
                activitymessage = f"{current_players}/{max_players} | Wipe: {last_wipe[2]}.{last_wipe[1]}."
          elif status == "offline":
             activitymessage = f"offline"
 
          if debug:
-            print(f"Rust Server status: {status}: {current_players}/{max_players} ({queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}.")
+            print(f"Rust Server status: {status}: {current_players}/{max_players} (+{queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}.")
             print(f"Acitivity Message: \"{activitymessage}\"")
             print(f"Next Update: {update_interval}")
 
