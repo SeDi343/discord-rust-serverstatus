@@ -1,7 +1,9 @@
 {
-   "discord_token": "YOURDISCORDBOT",
-   "api_url": "https://api.battlemetrics.com/servers/YOURSERVERNUMBER",
+   "discord_token": "YOUR_DISCORD_TOKEN_HERE",
+   "api_url_battlemetrics": "YOUR_BATTLEMETRICS_API_HERE",
+   "api_url_rust-servers": "YOUR_RUST-SERVERS_API_HERE",
+   "use_api": "1",
    "update_interval": "1",
-   "gameserver_ip": "",
-   "gameserver_port": ""
+   "gameserver_ip": "5.83.171.88",
+   "gameserver_port": "20000"
 }

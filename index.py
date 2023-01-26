@@ -71,33 +71,52 @@ async def statusloop():
    while True:
       # API Call
       try:
-         async with aiohttp.ClientSession() as session:
-            async with session.get(config_data.get("api_url")) as response:
-               if response.status == 200:
-                  if debug:
-                     print("> Battlemetrics API Request successful")
-                  rust_server_status_bm = await response.json()
-                  status = rust_server_status_bm["data"]["attributes"].get("status")
-                  current_players = rust_server_status_bm["data"]["attributes"].get("players")
-                  max_players = rust_server_status_bm["data"]["attributes"].get("maxPlayers")
-                  queued_players = rust_server_status_bm["data"]["attributes"]["details"].get("rust_queued_players")
-                  last_wipe = rust_server_status_bm["data"]["attributes"]["details"].get("rust_last_wipe").split("T")[0].split("-")
+         # Check what API is used
+         match config_data.get("use_api"):
+            # Battlemetrics
+            case "1":
+               async with aiohttp.ClientSession() as session:
+                  async with session.get(config_data.get("api_url_battlemetrics")) as response:
+                     if response.status == 200:
+                        if debug:
+                           print("> Battlemetrics API Request successful")
+                        rust_server_status_bm = await response.json()
+                        status = rust_server_status_bm["data"]["attributes"].get("status")
+                        current_players = rust_server_status_bm["data"]["attributes"].get("players")
+                        max_players = rust_server_status_bm["data"]["attributes"].get("maxPlayers")
+                        queued_players = rust_server_status_bm["data"]["attributes"]["details"].get("rust_queued_players")
+                        last_wipe = rust_server_status_bm["data"]["attributes"]["details"].get("rust_last_wipe").split("T")[0].split("-")
+                     else:
+                        print(f"> Failed to update Battlemetrics API: {response.status}\n")
+
+               # Check status and create activity string
+               if status == "online":
+                  if int(queued_players) > 0:
+                     activitymessage = f"{current_players}/{max_players} (+{queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}."
+                  else:
+                     activitymessage = f"{current_players}/{max_players} | Wipe: {last_wipe[2]}.{last_wipe[1]}."
+               elif status == "offline":
+                  activitymessage = f"offline"
+
+            # rust-servers.net
+            case "2":
+               async with aiohttp.ClientSession() as session:
+                  async with session.get(config_data.get("api_url_rust-servers")) as response:
+                     if response.status == 200:
+                        if debug:
+                           print("> rust-servers.net API Request successful")
+                        rust_server_status_rs = await response.json(content_type="text/html; charset=utf-8")
+                        status = rust_server_status_rs.get("is_online")
+                        current_players = rust_server_status_rs.get("players")
+                        max_players = rust_server_status_rs.get("maxplayers")
+                     else:
+                        print(f"> Failed to update rust-servers.net API: {response.status}\n")
+
+               # Check status and create activity string
+               if status == "1":
+                  activitymessage = f"{current_players}/{max_players}"
                else:
-                  print(f"> Failed to update Battlemetrics API: {response.status}\n")
-
-         # Check status and create activity string
-         if status == "online":
-            if int(queued_players) > 0:
-               activitymessage = f"{current_players}/{max_players} (+{queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}."
-            else:
-               activitymessage = f"{current_players}/{max_players} | Wipe: {last_wipe[2]}.{last_wipe[1]}."
-         elif status == "offline":
-            activitymessage = f"offline"
-
-         if debug:
-            print(f"Rust Server status: {status}: {current_players}/{max_players} (+{queued_players}) | Wipe: {last_wipe[2]}.{last_wipe[1]}.")
-            print(f"Acitivity Message: \"{activitymessage}\"")
-            print(f"Next Update: {update_interval}")
+                  activitymessage = "offline"
 
          # Send new Status Message
          await client.change_presence(status=discord.Status.online, activity=discord.Game(name=activitymessage))
