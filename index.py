@@ -96,7 +96,7 @@ async def statusloop():
                   else:
                      activitymessage = f"{current_players}/{max_players} | Wipe: {last_wipe[2]}.{last_wipe[1]}."
                elif status == "offline":
-                  activitymessage = f"offline"
+                  activitymessage = f"offline | Wipe: {last_wipe[2]}.{last_wipe[1]}."
 
             # rust-servers.net
             case "2":
