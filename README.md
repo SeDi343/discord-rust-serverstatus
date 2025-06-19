@@ -7,5 +7,11 @@ Afterwards go to the "Bot" Section and create the Bot.
 Finally it is important to press "Reset Token" to receive your token for your Bot.  
 Put this token now into the token file. Now you're able to launch the bot!  
 
-Bot requires python3.11. Install python requirements using "python3.11 -m pip install -r requirements.txt".  
+This Music Bot requires python3 and python venv(tested on 3.11 and 3.13) https://www.python.org/downloads/  
+Install python requirements using:  
+* python3 -m venv discord-music-venv
+* source discord-music-venv/bin/activate
+* pip install -r requirements.txt
+* python index.py / sh start.sh (for a screen session)
+
 Also check config.json and addapt discord_token and api_url with your settings.  
