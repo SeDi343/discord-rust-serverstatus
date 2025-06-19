@@ -1,6 +1,4 @@
 discord.py
-traceback
 requests
 aiohttp
 asyncio
-json

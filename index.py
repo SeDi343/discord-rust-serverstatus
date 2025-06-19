@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.11
+#!/usr/bin/env python3
 # Imports
 import sys
 import json
@@ -131,7 +131,6 @@ async def statusloop():
 async def statusloop_before_loop():
    # Wait until Discord Server is ready then start statusloop
    await client.wait_until_ready()
-
 
 #########################################################################################
 # Server Start
