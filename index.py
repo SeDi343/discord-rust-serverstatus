@@ -6,7 +6,7 @@ import asyncio
 import aiohttp
 import requests
 import traceback
-import discord
+from discord import app_commands, Intents, Client, Interaction, Status, Game
 from discord.ext import tasks
 
 debug = False
@@ -33,6 +33,8 @@ if not data.get("id", None):
    sys.exit(False)
 
 update_interval = int(config_data.get("update_interval"))*60
+server_ip = config_data.get("gameserver_ip")
+server_port = config_data.get("gameserver_port")
 
 # Welcome in console
 print("\n".join([
@@ -43,8 +45,20 @@ print("\n".join([
 # Start Up
 #########################################################################################
 
-# A Basic Discord Bot Client
-client = discord.Client(intents = discord.Intents.default())
+# Main Class to response in Discord
+class ChatResponse(Client):
+    def __init__(self):
+        super().__init__(intents = Intents.all())
+        self.tree = app_commands.CommandTree(self)
+
+    async def setup_hook(self) -> None:
+        """ This is called when the bot boots, to setup the global commands """
+        await self.tree.sync(guild = None)
+
+# Variable to store the bot class and interact with it
+# Since this is a simple bot to run 1 command over slash commands
+# We then do not need any intents to listen to events
+client = ChatResponse()
 
 @client.event
 async def on_ready():
@@ -59,6 +73,7 @@ async def on_ready():
         f"https://discord.com/api/oauth2/authorize?client_id={client.user.id}&scope=applications.commands%20bot"
     ]))
 
+    await client.tree.sync()
     client.loop.create_task(statusloop())
 
 #########################################################################################
@@ -119,7 +134,7 @@ async def statusloop():
                   activitymessage = "offline"
 
          # Send new Status Message
-         await client.change_presence(status=discord.Status.online, activity=discord.Game(name=activitymessage))
+         await client.change_presence(status=Status.online, activity=Game(name=activitymessage))
 
          # Wait for update interval
          await asyncio.sleep(update_interval)
@@ -127,10 +142,51 @@ async def statusloop():
       except Exception:
          print(f"> Exception occured processing Rust Server Status: {traceback.print_exc()}")
 
+# Function for Gameserver connect command response
+async def _init_command_ip_response(interaction: Interaction):
+    """A gameserver connect command response from the Bot"""
+
+    # Respond in the console that the command has been ran
+    print(f"> {interaction.guild} : {interaction.user} used the ip command.")
+
+    # Respond with the connection command
+    await interaction.response.send_message("\n".join([
+        f"Hey {interaction.user.mention}, following you find the commands for the F1 console to connect to the server",
+        "",
+        f"**client.connect {server_ip}:{server_port}**"
+    ]))
+
+# Function to send donation response
+async def _init_command_donation_response(interaction: Interaction):
+    """The function to send donation link"""
+    try:
+        # Respond in the console that the command has been ran
+        print(f"> {interaction.guild} : {interaction.user} used the donation command.")
+
+        await interaction.response.send_message("\n".join([
+            f"Hey {interaction.user.mention}, thank you for considering donating to support my work!",
+            f"You can donate via PayPal using https://donate.aerography.eu/ :heart_hands:"]))
+    except Exception:
+        print(f" > Exception occured processing donation command: {traceback.format_exc()}")
+        await interaction.followup.send(f"Exception occured processing reddit. Please contact <@164129430766092289> when this happened.")
+        return await interaction.channel.send(embed=console_create(traceback))
+
 @statusloop.before_loop
 async def statusloop_before_loop():
    # Wait until Discord Server is ready then start statusloop
    await client.wait_until_ready()
+
+# Command to check connect command for gameserver
+@client.tree.command()
+async def ip(interaction: Interaction):
+    """Command to check gameserver connect command"""
+    await _init_command_ip_response(interaction)
+
+# Command for Donation
+@client.tree.command()
+async def donate(interaction: Interaction):
+    """A command to send donation link"""
+    await _init_command_donation_response(interaction)
 
 #########################################################################################
 # Server Start
