@@ -191,8 +191,8 @@ async def _init_command_wipe_response(interaction: Interaction):
 
     await interaction.response.send_message("\n".join([
         f"Hey {interaction.user.mention},",
-        f"the next force wipe is on {first_thursday.strftime('%d.%m.%Y')} ~ 08:00 PM",
-        f"der nächste Force Wipe ist am {first_thursday.strftime('%d.%m.%Y')} ~ 20:00 Uhr"]))
+        f"der nächste Force Wipe ist am {first_thursday.strftime('%d.%m.%Y')} ~ 20:00 Uhr",
+        f"the next force wipe is on {first_thursday.strftime('%d.%m.%Y')} ~ 08:00 PM"]))
 
 @statusloop.before_loop
 async def statusloop_before_loop():
