@@ -6,6 +6,7 @@ import asyncio
 import aiohttp
 import requests
 import traceback
+import datetime
 from discord import app_commands, Intents, Client, Interaction, Status, Game
 from discord.ext import tasks
 
@@ -171,6 +172,28 @@ async def _init_command_donation_response(interaction: Interaction):
         await interaction.followup.send(f"Exception occured processing reddit. Please contact <@164129430766092289> when this happened.")
         return await interaction.channel.send(embed=console_create(traceback))
 
+async def _init_command_wipe_response(interaction: Interaction):
+    """The fucntion to send the next wipe day"""
+    # Respond in the console that the command has been ran
+    print(f"> {interaction.guild} : {interaction.user} used the wipe command.")
+
+    today = datetime.date.today()
+
+    # Move to the first day of the next month
+    if today.month == 12:
+        next_month = datetime.date(today.year + 1, 1, 1)
+    else:
+        next_month = datetime.date(today.year, today.month + 1, 1)
+
+    # Calculate the first Thursday
+    days_until_thursday = (3 - next_month.weekday()) % 7
+    first_thursday = next_month + datetime.timedelta(days=days_until_thursday)
+
+    await interaction.response.send_message("\n".join([
+        f"Hey {interaction.user.mention},",
+        f"the next force wipe is on {first_thursday.strftime('%d.%m.%Y')} ~ 08:00 PM",
+        f"der nächste Force Wipe ist am {first_thursday.strftime('%d.%m.%Y')} ~ 20:00 Uhr"]))
+
 @statusloop.before_loop
 async def statusloop_before_loop():
    # Wait until Discord Server is ready then start statusloop
@@ -181,6 +204,12 @@ async def statusloop_before_loop():
 async def ip(interaction: Interaction):
     """Command to check gameserver connect command"""
     await _init_command_ip_response(interaction)
+
+# Command to check the next wipe day
+@client.tree.command()
+async def wipe(interaction: Interaction):
+    """Command to check the next wipe day"""
+    await _init_command_wipe_response(interaction)
 
 # Command for Donation
 @client.tree.command()
