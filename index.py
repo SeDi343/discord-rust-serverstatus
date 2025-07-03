@@ -185,14 +185,25 @@ async def _init_command_wipe_response(interaction: Interaction):
     else:
         next_month = datetime.date(today.year, today.month + 1, 1)
 
-    # Calculate the first Thursday
+    # Calculate the first Thursday of next month
     days_until_thursday = (3 - next_month.weekday()) % 7
     first_thursday = next_month + datetime.timedelta(days=days_until_thursday)
 
-    await interaction.response.send_message("\n".join([
-        f"Hey {interaction.user.mention},",
-        f"der nächste Force Wipe ist am {first_thursday.strftime('%d.%m.%Y')} ~ 20:00 Uhr",
-        f"the next force wipe is on {first_thursday.strftime('%d.%m.%Y')} ~ 08:00 PM"]))
+    # Calculate the first Thursday of this month
+    this_month = datetime.date(today.year, today.month, 1)
+    days_until_this_thursday = (3 - this_month.weekday()) % 7
+    this_first_thursday = this_month + datetime.timedelta(days=days_until_this_thursday)
+
+    if today == this_first_thursday:
+        await interaction.response.send_message("\n".join([
+            f"Hey {interaction.user.mention},",
+            f"der nächste Force Wipe ist am {this_first_thursday.strftime('%d.%m.%Y')} ~ 20:00 Uhr",
+            f"the next force wipe is on {this_first_thursday.strftime('%d.%m.%Y')} ~ 08:00 PM"]))
+    else:
+        await interaction.response.send_message("\n".join([
+            f"Hey {interaction.user.mention},",
+            f"der nächste Force Wipe ist am {first_thursday.strftime('%d.%m.%Y')} ~ 20:00 Uhr",
+            f"the next force wipe is on {first_thursday.strftime('%d.%m.%Y')} ~ 08:00 PM"]))
 
 @statusloop.before_loop
 async def statusloop_before_loop():
